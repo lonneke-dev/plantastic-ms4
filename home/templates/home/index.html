@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="container d-flex justify-content-center index">
+        <div class="row">
+            <div class="col-12 text-center p-3 my-auto">
+                <h1>Plantastic</h1>
+                <hr>
+                <h2>Find Your New Plant Friend Today!</h2>
+                <hr>
+                <a href="{% url 'products' %}" class="btn btn-outline-success">Shop Plants</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

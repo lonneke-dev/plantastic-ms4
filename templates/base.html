@@ -1,0 +1,125 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+    <head>
+    {% include 'includes/meta.html' %}
+
+    {% block extra_meta %}
+    {% endblock %}
+
+    {% block corecss %}
+        {% include 'includes/externalcss.html' %}
+        <link href="{% static 'css/base.css' %}" rel="stylesheet">
+    {% endblock %}
+
+    {% block extra_css %}
+    {% endblock %}
+
+    {% block corejs %}
+        <script src="https://kit.fontawesome.com/d4489e94b7.js" crossorigin="anonymous"></script>
+        <!-- Stripe -->
+        <script src="https://js.stripe.com/v3/"></script>
+    {% endblock %}
+
+    {% block extra_js %}
+    {% endblock %}
+
+        <title>Plantastic {% block extra_title %}{% endblock %}</title>
+    </head>
+    <body>
+        <header>
+            <!-- Bootstrap Collapsing Navbar -->
+            <!-- Note - change class navbar-expand to navbar-expand-sm to collapse menu on small devices if required -->
+            <nav class="navbar navbar-expand-sm navbar-light bg-light fixed-top">
+                <div class="container-fluid">
+                    <a class="navbar-brand px-3 logo-font" href="{% url 'home' %}">plantastic</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarNavDarkDropdown" aria-controls="navbarNavDarkDropdown"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
+                        <ul class="navbar-nav ms-auto px-3 p-1">
+                            {% if categories_all|length > 1 %}
+                                {% for category in categories_all %}
+                                <li class="nav-item p-1">
+                                    <a href="{% url 'products' %}?category={{ category.name }}" class="nav-link">{{ category.friendly_name }}</a>
+                                </li>
+                                {% endfor %}
+                            {% endif %}
+                            <li>
+                                <form method="GET" action="{% url 'products' %}"  class="d-flex pt-3">
+                                    <input class="form-control" type="search" name="q" placeholder="Search" aria-label="Search Products">
+                                    <button class="btn btn-outline-dark me-4" type="submit" aria-label="Search Products"><i class="fas fa-search"></i></button>
+                                </form>
+                            </li>
+                            <li class="nav-item dropdown text-center me-2">
+                                <a href="#" class="nav-link" id="navbarUserMenu"
+                                    data-bs-toggle="dropdown" aria-expanded="false" aria-label="User dropdown menu">
+                                    <i class="fas fa-lg fa-user"></i>
+                                    <p class="mb-0">account</p>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="navbarUserMenu">
+                                    {% if request.user.is_authenticated %}
+                                        {% if request.user.is_superuser %}
+                                        <li><a class="dropdown-item" href="{% url 'add_product' %}">Add Plant</a></li>
+                                        {% endif %}
+                                        <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'account_logout' %}">Sign Out</a></li>   
+                                    {% else %}
+                                        <li><a class="dropdown-item" href="{% url 'account_login' %}?next={{request.path}}">Sign In</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'account_signup' %}">Sign Up</a></li>
+                                    {% endif %}
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown text-center">
+                                <a href="{% url 'view_basket' %}" class="nav-link" aria-label="View Basket">
+                                    <i class="fas fa-lg fa-shopping-basket"></i>
+                                    <p class="mb-0">
+                                        {% if grand_total %}
+                                            €{{ grand_total|floatformat:2 }}
+                                        {% else %}
+                                            €0.00
+                                        {% endif %}
+                                    </p>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>                
+                </div>
+            </nav>
+        </header>
+
+        <div class="top"></div>
+
+        {% if messages %}
+            <div class="message-container">
+                {% for message in messages %}
+                {% with message.level as level %}
+                    {% if level == 40 %}
+                        {% include 'includes/toasts/toast_error.html' %}
+                    {% elif level == 30 %}
+                        {% include 'includes/toasts/toast_warning.html' %}
+                    {% elif level == 25 %}
+                        {% include 'includes/toasts/toast_success.html' %}
+                    {% else %}
+                        {% include 'includes/toasts/toast_info.html' %}
+                    {% endif %}
+                {% endwith %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block page_header %}
+        {% endblock %}
+
+        {% block content %}
+        {% endblock %}
+
+        {% block postloadjs %}
+            {% include 'includes/externaljs.html' %} 
+            <script src="{% static 'js/base.js' %}"></script>
+        {% endblock %}
+
+    </body>
+</html>
